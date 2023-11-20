@@ -1,0 +1,9 @@
+[user]
+email = srinivasj2601@gmail.com
+name = srinivas
+ 
+[github]
+user = "srinivasj26"
+ 
+[core]
+sshCommand = "ssh -i ~/.ssh/id_ed25519"
