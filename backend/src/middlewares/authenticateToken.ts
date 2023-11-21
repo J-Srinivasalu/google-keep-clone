@@ -29,6 +29,7 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
     (req as AuthenticatedRequest).user = decoded;
     next();
   } catch (err) {
+    console.log(err);
     res.status(Unauthorized.statusCode).json({
       error: Unauthorized.error,
       message: Unauthorized.message,

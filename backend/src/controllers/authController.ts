@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { createUser, loginUser } from "../services/userService";
 import CustomError, { BadRequest } from "../utils/errors.utils";
 
-const userInput = z.object({
+const signupInput = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(20),
 });
@@ -15,7 +15,7 @@ export async function signupController(req: Request, res: Response) {
   try {
     const newUser: IUser = req.body;
 
-    const parsedUser = userInput.safeParse(newUser);
+    const parsedUser = signupInput.safeParse(newUser);
     if (!parsedUser.success) {
       throw BadRequest;
     }
@@ -55,11 +55,6 @@ export async function signupController(req: Request, res: Response) {
 export async function signinController(req: Request, res: Response) {
   try {
     const requestedUser: IUser = req.body;
-
-    const parsedUser = userInput.safeParse(requestedUser);
-    if (!parsedUser.success) {
-      throw BadRequest;
-    }
 
     //find user
     const user = await loginUser(requestedUser);

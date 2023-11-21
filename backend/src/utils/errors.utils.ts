@@ -38,5 +38,5 @@ export const NoteNoteFoundError = new CustomError(
 export const Unauthorized = new CustomError(
   401,
   "Unauthorized",
-  "User not unauthorized"
+  "User not authorized"
 );
