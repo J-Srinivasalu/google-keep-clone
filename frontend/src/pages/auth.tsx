@@ -3,18 +3,34 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IErrorResponse, ISuccessResponse } from "../models/IResponse";
 
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Paper,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+
 const Auth = () => {
   const navigate = useNavigate();
 
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [loginMethod, setLoginMethod] = useState("signin");
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const onSubmit = async () => {
-    console.log(email + " " + password);
-    if (isSignUp) {
+    setErrorMessage("");
+    if (loginMethod == "signup") {
+      if (password.length < 8) {
+        setErrorMessage("Password must be atleast 8 character long");
+        return;
+      }
       if (password == confirmPassword) {
         authenticate("auth/signup");
       } else {
@@ -51,35 +67,83 @@ const Auth = () => {
   };
 
   return (
-    <div>
-      <div>
-        <button onClick={() => setIsSignUp(false)}>Sign In</button>
-        <button onClick={() => setIsSignUp(true)}>Sign Up</button>
-      </div>
-      <br />
-      Email:
-      <br />
-      <input type="email" onChange={(e) => setEmail(e.target.value)} />
-      <br />
-      Password:
-      <br />
-      <input type="password" onChange={(e) => setPassword(e.target.value)} />
-      {isSignUp && (
-        <>
-          <br />
-          Confirm Password:
-          <br />
-          <input
-            type="password"
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </>
-      )}
-      <br />
-      {errorMessage}
-      <br />
-      <button onClick={onSubmit}>{isSignUp ? "Sign Up" : "Sign In"}</button>
-    </div>
+    <Grid>
+      <Paper
+        elevation={10}
+        style={{ padding: 20, width: 400, height: "70vh", margin: "40px auto" }}
+      >
+        <Box marginBottom={"10px"}>
+          <ToggleButtonGroup
+            value={loginMethod}
+            fullWidth
+            exclusive
+            onChange={(_event, value) => {
+              setErrorMessage("");
+              setLoginMethod(value);
+            }}
+          >
+            <ToggleButton value="signin">Sign In</ToggleButton>
+            <ToggleButton value="signup">Sign Up</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+        {errorMessage != "" && (
+          <Alert severity="info" onClose={() => {}}>
+            {errorMessage}
+          </Alert>
+        )}
+        <Typography
+          paddingInlineStart={"10px"}
+          marginTop={"20px"}
+          marginBottom={"10px"}
+        >
+          Email:
+        </Typography>
+        <TextField
+          type="email"
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          required
+        ></TextField>
+        <Typography
+          paddingInlineStart={"10px"}
+          marginTop={"20px"}
+          marginBottom={"10px"}
+        >
+          Password:
+        </Typography>
+        <TextField
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+          fullWidth
+          required
+        ></TextField>
+        {loginMethod == "signup" && (
+          <>
+            <Typography
+              paddingInlineStart={"10px"}
+              marginTop={"20px"}
+              marginBottom={"10px"}
+            >
+              Confirm Password:
+            </Typography>
+            <TextField
+              type="password"
+              placeholder="Confirm Password"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              fullWidth
+              required
+            ></TextField>
+          </>
+        )}
+        <Box marginTop={"20px"}>
+          <Button variant="outlined" fullWidth onClick={onSubmit}>
+            Submit
+          </Button>
+        </Box>
+      </Paper>
+    </Grid>
   );
 };
 
