@@ -1,7 +1,6 @@
 import { Clear } from "@mui/icons-material";
 import { IconButton, Paper, Typography } from "@mui/material";
-import { useState } from "react";
-import { FC } from "react";
+import { useState, FC } from "react";
 import { INote } from "../models/INote";
 import axios, { AxiosError } from "axios";
 import { IErrorResponse } from "../models/IResponse";
@@ -16,7 +15,11 @@ interface NoteProps {
 const Note: FC<NoteProps> = (props) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const deleteNote = async (id: string | undefined) => {
+  const deleteNote = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    id: string | undefined
+  ) => {
+    event.stopPropagation();
     if (!id) {
       props.onError("something went wrong, please try again");
       return;
@@ -63,14 +66,14 @@ const Note: FC<NoteProps> = (props) => {
         <IconButton
           style={{
             position: "absolute",
-            top: 5,
-            right: 5,
+            top: -15,
+            right: -5,
           }}
-          onClick={() => {
-            deleteNote(props.note.id);
+          onClick={(e) => {
+            deleteNote(e, props.note.id);
           }}
         >
-          <Clear />
+          <Clear color="error" />
         </IconButton>
       )}
       <Typography noWrap marginBottom="10px">

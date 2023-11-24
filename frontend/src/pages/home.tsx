@@ -24,18 +24,27 @@ interface GetNotesResponse {
 
 interface AddNoteProps {
   open: boolean;
-  note?: INote;
+  noteToUpdate?: INote;
   onClose: (note: INote) => void;
 }
 
 const AddNoteDialog = (props: AddNoteProps) => {
-  const { open, note, onClose } = props;
-  const [title, setTitle] = useState(note?.title ?? "");
-  const [description, setDescription] = useState(note?.description ?? "");
+  const { open, noteToUpdate, onClose } = props;
+  const [title, setTitle] = useState(noteToUpdate?.title || "");
+  const [description, setDescription] = useState(
+    noteToUpdate?.description || ""
+  );
+
+  useEffect(() => {
+    if (open) {
+      setTitle(noteToUpdate?.title || "");
+      setDescription(noteToUpdate?.description || "");
+    }
+  }, [open, noteToUpdate]);
 
   const handleClose = () => {
     onClose({
-      id: note?.id,
+      id: noteToUpdate?.id,
       title: title,
       description: description,
     });
@@ -54,7 +63,7 @@ const AddNoteDialog = (props: AddNoteProps) => {
           marginTop={"20px"}
           marginBottom={"10px"}
         >
-          Note
+          {noteToUpdate ? "Update Note" : "Add Note"}
         </Typography>
         <TextField
           type="text"
@@ -80,10 +89,10 @@ const AddNoteDialog = (props: AddNoteProps) => {
 const Home = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<INote[]>([]);
+  const [open, setOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<INote | undefined>(
     undefined
   );
-  const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleOnClose = (note: INote) => {
@@ -96,7 +105,6 @@ const Home = () => {
     }
 
     setOpen(false);
-    setSelectedNote(undefined);
   };
 
   const saveNote = async (note: INote) => {
@@ -122,6 +130,7 @@ const Home = () => {
         setErrorMessage("Server Error. Please try after some time");
       }
     } catch (err) {
+      navigate("/auth");
       console.log(err);
       if (axios.isAxiosError(err)) {
         const response = (err as AxiosError).response?.data as IErrorResponse;
@@ -136,9 +145,19 @@ const Home = () => {
       return;
     }
 
+    const existingNote = notes.find((n) => n.id == note.id);
+
+    if (
+      existingNote &&
+      existingNote.title === note.title &&
+      existingNote.description === note.description
+    ) {
+      return;
+    }
+
     setNotes((prevNotes) => {
       const noteIndex = prevNotes.findIndex((n) => n.id === note.id);
-      if (noteIndex) {
+      if (noteIndex != -1) {
         prevNotes[noteIndex].title = note.title;
         prevNotes[noteIndex].description = note.description;
       }
@@ -184,7 +203,7 @@ const Home = () => {
     }
     console.log(token);
     getNotes(token);
-  }, [navigate]);
+  }, []);
 
   const getNotes = async (token: string) => {
     const authToken = `Bearer ${token}`;
@@ -198,8 +217,16 @@ const Home = () => {
       const notes: INote[] = (response.data as GetNotesResponse).data.notes;
 
       setNotes(notes);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
+      if (axios.isAxiosError(err)) {
+        const response = (err as AxiosError).response;
+        if (response?.status == 401) {
+          navigate("/auth");
+        }
+        const errorResponse = response?.data as IErrorResponse;
+        setErrorMessage(errorResponse.message);
+      }
     }
   };
 
@@ -209,17 +236,19 @@ const Home = () => {
   };
 
   const openAddDialog = () => {
-    setOpen(true);
     setSelectedNote(undefined);
+    setOpen(true);
   };
 
   const deleteNote = async (id: string) => {
     setNotes((prevNotes) => {
       const noteIndex = prevNotes.findIndex((n) => n.id === id);
-      if (noteIndex) {
+      const updateNotes = [];
+      if (noteIndex != -1) {
         prevNotes.splice(noteIndex, 1);
+        updateNotes.push(...prevNotes);
       }
-      return prevNotes;
+      return updateNotes;
     });
   };
 
@@ -267,8 +296,8 @@ const Home = () => {
               </Typography>
             </Grid>
           ) : (
-            notes.map((note, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            notes.map((note) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={note.id}>
                 <Note
                   note={note}
                   onClick={(note) => openUpdateDialog(note)}
@@ -282,8 +311,8 @@ const Home = () => {
       </Paper>
       <AddNoteDialog
         open={open}
-        note={selectedNote}
         onClose={(note) => handleOnClose(note)}
+        noteToUpdate={selectedNote}
       />
     </>
   );
