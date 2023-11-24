@@ -1,90 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
 import { INote } from "../models/INote";
-import {
-  Alert,
-  Box,
-  Button,
-  Dialog,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { IErrorResponse, ISuccessResponse } from "../models/IResponse";
+import { Alert, Box, Paper, TextField, Typography } from "@mui/material";
 import Note from "../components/Note";
-
-interface GetNotesResponse {
-  message: string;
-  data: {
-    notes: INote[];
-  };
-}
-
-interface AddNoteProps {
-  open: boolean;
-  noteToUpdate?: INote;
-  onClose: (note: INote) => void;
-}
-
-const AddNoteDialog = (props: AddNoteProps) => {
-  const { open, noteToUpdate, onClose } = props;
-  const [title, setTitle] = useState(noteToUpdate?.title || "");
-  const [description, setDescription] = useState(
-    noteToUpdate?.description || ""
-  );
-
-  useEffect(() => {
-    if (open) {
-      setTitle(noteToUpdate?.title || "");
-      setDescription(noteToUpdate?.description || "");
-    }
-  }, [open, noteToUpdate]);
-
-  const handleClose = () => {
-    onClose({
-      id: noteToUpdate?.id,
-      title: title,
-      description: description,
-    });
-  };
-
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      <Box
-        style={{
-          padding: 20,
-          maxWidth: 400,
-        }}
-      >
-        <Typography
-          paddingInlineStart={"10px"}
-          marginTop={"20px"}
-          marginBottom={"10px"}
-        >
-          {noteToUpdate ? "Update Note" : "Add Note"}
-        </Typography>
-        <TextField
-          type="text"
-          value={title}
-          placeholder="Title"
-          onChange={(e) => setTitle(e.target.value)}
-          fullWidth
-        ></TextField>
-        <TextField
-          type="text"
-          value={description}
-          placeholder="Description"
-          rows={10}
-          multiline
-          onChange={(e) => setDescription(e.target.value)}
-          fullWidth
-        ></TextField>
-      </Box>
-    </Dialog>
-  );
-};
+import { getNotes, saveNote, updateNote } from "../services/notesApiService";
+import AddNoteDialog from "../components/AddNoteDialog";
+import TopAppBar from "../components/TopAppBar";
+import Masonry from "@mui/lab/Masonry";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -95,58 +17,50 @@ const Home = () => {
   );
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleOnClose = (note: INote) => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      handleNavigateToAuth();
+      return;
+    }
+    console.log(token);
+    getNotes(
+      (notes) => setNotes(notes),
+      (errorMessage) => setErrorMessage(errorMessage),
+      () => handleNavigateToAuth()
+    );
+  }, []);
+
+  const handleNavigateToAuth = () => {
+    navigate("auth");
+  };
+
+  const openDialog = (note?: INote) => {
+    setSelectedNote(note);
+    setOpen(true);
+  };
+
+  const handleOnDialogClose = (note: INote) => {
     if (note.title.length != 0 || note.description.length != 0) {
       if (note.id) {
-        updateNote(note);
+        handleOnUpdateNote(note);
       } else {
-        saveNote(note);
+        saveNote(
+          note,
+          (newNote) => setNotes([...notes, newNote]),
+          (errorMessage) => setErrorMessage(errorMessage),
+          () => handleNavigateToAuth()
+        );
       }
     }
-
     setOpen(false);
   };
 
-  const saveNote = async (note: INote) => {
-    try {
-      const response = await axios.post(
-        `http://localhost:3000/notes`,
-        {
-          title: note.title,
-          description: note.description,
-        },
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      console.log(response.data);
-      try {
-        const id = (response.data as ISuccessResponse).data["id"];
-        note.id = id;
-        setNotes([...notes, note]);
-      } catch (err) {
-        setErrorMessage("Server Error. Please try after some time");
-      }
-    } catch (err) {
-      navigate("/auth");
-      console.log(err);
-      if (axios.isAxiosError(err)) {
-        const response = (err as AxiosError).response?.data as IErrorResponse;
-
-        setErrorMessage(response.message);
-      }
-    }
-  };
-
-  const updateNote = async (note: INote) => {
+  const handleOnUpdateNote = async (note: INote) => {
     if (!note.id) {
       return;
     }
-
     const existingNote = notes.find((n) => n.id == note.id);
-
     if (
       existingNote &&
       existingNote.title === note.title &&
@@ -155,6 +69,15 @@ const Home = () => {
       return;
     }
 
+    updateNote(
+      note,
+      (updatedNote) => updateGivenNote(updatedNote),
+      (errorMessage) => setErrorMessage(errorMessage),
+      () => handleNavigateToAuth()
+    );
+  };
+
+  const updateGivenNote = (note: INote) => {
     setNotes((prevNotes) => {
       const noteIndex = prevNotes.findIndex((n) => n.id === note.id);
       if (noteIndex != -1) {
@@ -163,84 +86,9 @@ const Home = () => {
       }
       return prevNotes;
     });
-
-    try {
-      const response = await axios.patch(
-        `http://localhost:3000/notes`,
-        {
-          id: note.id,
-          title: note.title,
-          description: note.description,
-        },
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      console.log(response.data);
-      try {
-        const res = response.data as ISuccessResponse;
-        console.log(res);
-      } catch (err) {
-        setErrorMessage("Server Error. Please try after some time");
-      }
-    } catch (err) {
-      console.log(err);
-      if (axios.isAxiosError(err)) {
-        const response = (err as AxiosError).response?.data as IErrorResponse;
-
-        setErrorMessage(response.message);
-      }
-    }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/auth");
-      return;
-    }
-    console.log(token);
-    getNotes(token);
-  }, []);
-
-  const getNotes = async (token: string) => {
-    const authToken = `Bearer ${token}`;
-    try {
-      const response = await axios.get("http://localhost:3000/notes", {
-        headers: {
-          Authorization: authToken,
-        },
-      });
-
-      const notes: INote[] = (response.data as GetNotesResponse).data.notes;
-
-      setNotes(notes);
-    } catch (err) {
-      console.log(err);
-      if (axios.isAxiosError(err)) {
-        const response = (err as AxiosError).response;
-        if (response?.status == 401) {
-          navigate("/auth");
-        }
-        const errorResponse = response?.data as IErrorResponse;
-        setErrorMessage(errorResponse.message);
-      }
-    }
-  };
-
-  const openUpdateDialog = (note: INote) => {
-    setSelectedNote(note);
-    setOpen(true);
-  };
-
-  const openAddDialog = () => {
-    setSelectedNote(undefined);
-    setOpen(true);
-  };
-
-  const deleteNote = async (id: string) => {
+  const handleOnDeleteNote = async (id: string) => {
     setNotes((prevNotes) => {
       const noteIndex = prevNotes.findIndex((n) => n.id === id);
       const updateNotes = [];
@@ -252,21 +100,10 @@ const Home = () => {
     });
   };
 
-  const signout = () => {
-    localStorage.removeItem("token");
-    navigate("/auth");
-  };
-
   return (
     <>
-      <Paper style={{ margin: "10px", padding: "10px" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h4">Notes</Typography>
-          <Button variant="outlined" onClick={signout}>
-            Sign Out
-          </Button>
-        </Box>
-      </Paper>
+      <TopAppBar />
+      <Box height={"60px"} />
       {errorMessage != "" && (
         <Alert
           severity="info"
@@ -277,41 +114,44 @@ const Home = () => {
           {errorMessage}
         </Alert>
       )}
-      <Paper style={{ margin: "10px" }}>
+      <Paper
+        style={{
+          margin: "10px auto",
+          width: "70vw",
+        }}
+      >
         <TextField
           placeholder="Add Note"
           onClick={() => {
             console.log("clicked");
-            openAddDialog();
+            openDialog();
           }}
           fullWidth
         ></TextField>
       </Paper>
-      <Paper style={{ margin: "10px", padding: "10px" }}>
-        <Grid container spacing={2} wrap="wrap">
+      <Box margin={"20px auto"} width={"90vw"}>
+        <Masonry columns={5} spacing={2}>
           {notes.length === 0 ? (
-            <Grid item xs={12}>
-              <Typography align="center" variant="h6">
-                No notes
-              </Typography>
-            </Grid>
+            <Typography align="center" variant="h6">
+              No notes
+            </Typography>
           ) : (
             notes.map((note) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={note.id}>
-                <Note
-                  note={note}
-                  onClick={(note) => openUpdateDialog(note)}
-                  onDelete={(id) => deleteNote(id)}
-                  onError={(error) => setErrorMessage(error)}
-                />
-              </Grid>
+              <Note
+                key={note.id}
+                note={note}
+                onClick={(note) => openDialog(note)}
+                onDelete={(id) => handleOnDeleteNote(id)}
+                onError={(error) => setErrorMessage(error)}
+                navigateToAuth={handleNavigateToAuth}
+              />
             ))
           )}
-        </Grid>
-      </Paper>
+        </Masonry>
+      </Box>
       <AddNoteDialog
         open={open}
-        onClose={(note) => handleOnClose(note)}
+        onClose={(note) => handleOnDialogClose(note)}
         noteToUpdate={selectedNote}
       />
     </>
