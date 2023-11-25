@@ -2,23 +2,25 @@ import { IUser } from "../models/IUser";
 import { UserModel } from "../models/user";
 import {
   ServerError,
+  UserFoundError,
   UserNotFoundError,
   WrongCredentials,
 } from "../utils/errors.utils";
 import bcrypt from "bcrypt";
 export async function createUser(user: IUser) {
-  try {
-    await UserModel.create(
-      new UserModel({
-        id: user.id,
-        email: user.email,
-        password: user.password,
-        notes: user.notes,
-      })
-    );
-  } catch (err) {
-    throw ServerError;
+  const foundUser = await UserModel.findOne({ email: user.email });
+  if (foundUser) {
+    throw UserFoundError;
   }
+
+  await UserModel.create(
+    new UserModel({
+      id: user.id,
+      email: user.email,
+      password: user.password,
+      notes: user.notes,
+    })
+  );
 }
 
 export async function loginUser(user: IUser) {

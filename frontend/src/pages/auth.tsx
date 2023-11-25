@@ -1,7 +1,5 @@
-import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IErrorResponse, ISuccessResponse } from "../models/IResponse";
 
 import {
   Alert,
@@ -14,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import AuthInputField from "../components/AuthInputField";
+import { signIn, signUp } from "../services/authApiService";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -32,37 +31,22 @@ const Auth = () => {
         return;
       }
       if (password == confirmPassword) {
-        authenticate("auth/signup");
+        signUp(
+          email,
+          password,
+          () => navigate("/"),
+          (errorMessage) => setErrorMessage(errorMessage)
+        );
       } else {
         setErrorMessage("Password don't match");
       }
     } else {
-      authenticate("auth/signin");
-    }
-  };
-
-  const authenticate = async (path: string) => {
-    try {
-      const response = await axios.post(`http://localhost:3000/${path}`, {
-        email: email,
-        password: password,
-      });
-      console.log(response.data);
-      try {
-        const token = (response.data as ISuccessResponse).data["token"];
-        localStorage.setItem("token", token);
-        console.log(token);
-        navigate("/");
-      } catch (err) {
-        setErrorMessage("Server Error. Please try after some time");
-      }
-    } catch (err) {
-      console.log(err);
-      if (axios.isAxiosError(err)) {
-        const response = (err as AxiosError).response?.data as IErrorResponse;
-
-        setErrorMessage(response.message);
-      }
+      signIn(
+        email,
+        password,
+        () => navigate("/"),
+        (errorMessage) => setErrorMessage(errorMessage)
+      );
     }
   };
 

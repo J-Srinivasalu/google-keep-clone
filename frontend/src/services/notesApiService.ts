@@ -1,6 +1,10 @@
-import axios, { AxiosError } from "axios";
 import { INote } from "../models/INote";
-import { IErrorResponse, ISuccessResponse } from "../models/IResponse";
+import { ISuccessResponse } from "../models/IResponse";
+import config from "../config/config";
+import handleAxiosError from "./axiosErrorHelper";
+import axios from "axios";
+
+const baseUrl = config.baseUrl;
 
 interface GetNotesResponse {
   message: string;
@@ -8,26 +12,6 @@ interface GetNotesResponse {
     notes: INote[];
   };
 }
-
-const handleAxiosError = (
-  err: unknown,
-  navigateToAuth: () => void,
-  onError: (errorMessage: string) => void
-) => {
-  console.log(err);
-  if (axios.isAxiosError(err)) {
-    const axiosError = err as AxiosError;
-    if (axiosError.code == "ERR_NETWORK") {
-      onError("Server down, Please try after sometime");
-    }
-    const response = axiosError.response;
-    if (response?.status == 401) {
-      navigateToAuth();
-    }
-    const errorResponse = response?.data as IErrorResponse;
-    onError(errorResponse.message);
-  }
-};
 
 export async function getNotes(
   onSuccess: (notes: INote[]) => void,
@@ -41,7 +25,7 @@ export async function getNotes(
   }
   const authToken = `Bearer ${token}`;
   try {
-    const response = await axios.get("http://localhost:3000/notes", {
+    const response = await axios.get(`${baseUrl}/notes`, {
       headers: {
         Authorization: authToken,
       },
@@ -62,7 +46,7 @@ export async function saveNote(
 ) {
   try {
     const response = await axios.post(
-      `http://localhost:3000/notes`,
+      `${baseUrl}/notes`,
       {
         title: note.title,
         description: note.description,
@@ -94,7 +78,7 @@ export async function updateNote(
 ) {
   try {
     const response = await axios.patch(
-      `http://localhost:3000/notes`,
+      `${baseUrl}/notes`,
       {
         id: note.id,
         title: note.title,
@@ -126,14 +110,11 @@ export async function deleteNote(
   navigateToAuth: () => void
 ) {
   try {
-    const response = await axios.delete(
-      `http://localhost:3000/notes?noteId=${id}`,
-      {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      }
-    );
+    const response = await axios.delete(`${baseUrl}/notes?noteId=${id}`, {
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
     console.log(response.data);
     try {
       console.log("done delete");

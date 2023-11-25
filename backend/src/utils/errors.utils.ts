@@ -20,6 +20,13 @@ export const UserNotFoundError = new CustomError(
   "Not Found",
   "User not found"
 );
+
+export const UserFoundError = new CustomError(
+  400,
+  "Already Exist",
+  "User already exist with this email."
+);
+
 export const WrongCredentials = new CustomError(
   401,
   "Unauthorized",
