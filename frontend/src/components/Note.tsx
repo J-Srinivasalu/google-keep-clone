@@ -39,8 +39,8 @@ const Note: FC<NoteProps> = (props) => {
         position: "relative",
         padding: "20px",
         margin: "20px",
-        minWidth: 200,
-        maxWidth: 200,
+        minWidth: 150,
+        maxWidth: 150,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

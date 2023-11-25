@@ -9,11 +9,11 @@ import {
   Button,
   Grid,
   Paper,
-  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import AuthInputField from "../components/AuthInputField";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -72,8 +72,19 @@ const Auth = () => {
         elevation={10}
         style={{ padding: 20, width: 400, height: "70vh", margin: "40px auto" }}
       >
+        <Typography
+          paddingInlineStart={"10px"}
+          textAlign={"center"}
+          fontSize={25}
+          color={"primary"}
+          margin={"20px"}
+        >
+          Welcome!
+        </Typography>
         <Box marginBottom={"10px"}>
           <ToggleButtonGroup
+            color="primary"
+            size="small"
             value={loginMethod}
             fullWidth
             exclusive
@@ -91,57 +102,41 @@ const Auth = () => {
             {errorMessage}
           </Alert>
         )}
-        <Typography
-          paddingInlineStart={"10px"}
-          marginTop={"20px"}
-          marginBottom={"10px"}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
         >
-          Email:
-        </Typography>
-        <TextField
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          fullWidth
-          required
-        ></TextField>
-        <Typography
-          paddingInlineStart={"10px"}
-          marginTop={"20px"}
-          marginBottom={"10px"}
-        >
-          Password:
-        </Typography>
-        <TextField
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          required
-        ></TextField>
-        {loginMethod == "signup" && (
-          <>
-            <Typography
-              paddingInlineStart={"10px"}
-              marginTop={"20px"}
-              marginBottom={"10px"}
-            >
-              Confirm Password:
-            </Typography>
-            <TextField
+          <AuthInputField
+            type="email"
+            placeholder="Email"
+            onChange={(value) => setEmail(value)}
+          />
+          <AuthInputField
+            type="password"
+            placeholder="Password"
+            onChange={(value) => setPassword(value)}
+          />
+          {loginMethod == "signup" && (
+            <AuthInputField
               type="password"
               placeholder="Confirm Password"
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(value) => setConfirmPassword(value)}
+            />
+          )}
+          <Box marginTop={"20px"}>
+            <Button
+              type="submit"
+              size="large"
+              variant="contained"
               fullWidth
-              required
-            ></TextField>
-          </>
-        )}
-        <Box marginTop={"20px"}>
-          <Button variant="outlined" fullWidth onClick={onSubmit}>
-            Submit
-          </Button>
-        </Box>
+              onClick={onSubmit}
+            >
+              Submit
+            </Button>
+          </Box>
+        </form>
       </Paper>
     </Grid>
   );

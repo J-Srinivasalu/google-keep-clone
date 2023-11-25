@@ -6,7 +6,7 @@ import Note from "../components/Note";
 import { getNotes, saveNote, updateNote } from "../services/notesApiService";
 import AddNoteDialog from "../components/AddNoteDialog";
 import TopAppBar from "../components/TopAppBar";
-import Masonry from "@mui/lab/Masonry";
+import Masonary, { ResponsiveMasonry } from "react-responsive-masonry";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -103,7 +103,7 @@ const Home = () => {
   return (
     <>
       <TopAppBar />
-      <Box height={"60px"} />
+      <Box height={"80px"} />
       {errorMessage != "" && (
         <Alert
           severity="info"
@@ -130,24 +130,34 @@ const Home = () => {
         ></TextField>
       </Paper>
       <Box margin={"20px auto"} width={"90vw"}>
-        <Masonry columns={5} spacing={2}>
-          {notes.length === 0 ? (
-            <Typography align="center" variant="h6">
-              No notes
-            </Typography>
-          ) : (
-            notes.map((note) => (
-              <Note
-                key={note.id}
-                note={note}
-                onClick={(note) => openDialog(note)}
-                onDelete={(id) => handleOnDeleteNote(id)}
-                onError={(error) => setErrorMessage(error)}
-                navigateToAuth={handleNavigateToAuth}
-              />
-            ))
-          )}
-        </Masonry>
+        <ResponsiveMasonry
+          columnsCountBreakPoints={{
+            330: 2,
+            750: 3,
+            1000: 4,
+            1150: 5,
+            1350: 6,
+          }}
+        >
+          <Masonary gutter="10px">
+            {notes.length === 0 ? (
+              <Typography align="center" variant="h6">
+                No notes
+              </Typography>
+            ) : (
+              notes.map((note) => (
+                <Note
+                  key={note.id}
+                  note={note}
+                  onClick={(note) => openDialog(note)}
+                  onDelete={(id) => handleOnDeleteNote(id)}
+                  onError={(error) => setErrorMessage(error)}
+                  navigateToAuth={handleNavigateToAuth}
+                />
+              ))
+            )}
+          </Masonary>
+        </ResponsiveMasonry>
       </Box>
       <AddNoteDialog
         open={open}
