@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Auth from "./pages/Auth";
+import Home from "./pages/Home.tsx";
+import Auth from "./pages/Auth.tsx";
 
 function App() {
   return (
