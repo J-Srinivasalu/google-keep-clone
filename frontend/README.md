@@ -1,30 +1,43 @@
-# React + TypeScript + Vite
+# Google Keep Clone - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This component is responsible for providing a user-friendly interface for managing and organizing notes.
 
-Currently, two official plugins are available:
+## Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React:** A JavaScript library for building user interfaces.
+- **Vite:** A fast build tool that significantly improves frontend development.
+- **Material-UI:** A popular React UI framework for building responsive and customizable components.
+- **Axios:** A promise-based HTTP client for making API calls.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. Create a .env file in root
 
-- Configure the top-level `parserOptions` property like this:
+   ```.env
+   VITE_ENV=<prod | dev>
+   VITE_PROD_URL=<PROD_BACKEND_URL>
+   VITE_DEV_URL=<DEV_BACKEND_URL>
+   ```
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+2. Install dependencies.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+   ```bash
+   npm install
+   ```
+
+3. Run the development server.
+
+   ```bash
+   npm run dev
+   ```
+
+## Features Implemented
+
+1. **Signup and Signin Pages:** User authentication interfaces.
+2. **Note Creation and Editing:** UI for adding, updating, and deleting notes.
+
+## Planned Features
+
+1. **Add Image to Note:** Allow users to attach images to their notes.
+2. **Convert List to Checkbox List:** Enable users to create checklist-style notes.
+3. **Dark-Light Mode:** Implement a visually appealing dark and light mode.

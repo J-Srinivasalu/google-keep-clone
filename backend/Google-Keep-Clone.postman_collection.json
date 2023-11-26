@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "24883c94-7300-479f-aa24-aef29fa3e082",
+		"name": "Google-Keep-Clone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30264869"
+	},
+	"item": [
+		{
+			"name": "Notes",
+			"item": [
+				{
+					"name": "get notes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ1NTMxIiwiZW1haWwiOiJkZWFkbWFuQG1haWwuY29tIiwiaWF0IjoxNzAwOTA4MTg0LCJleHAiOjE3MDA5NTEzODR9.SS03eRia56_M3GXm_ncFtaA-yQ_7UoaJpqqYyyT-6XI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{DEV_URL}}/notes?noteId=",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"notes"
+							],
+							"query": [
+								{
+									"key": "noteId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ1NTMxIiwiZW1haWwiOiJkZWFkbWFuQG1haWwuY29tIiwiaWF0IjoxNzAwODI5NjcyLCJleHAiOjE3MDA4NzI4NzJ9.7TLeJjZitu9outyeT2_qafmv_It9yCo5gvIGJJNro9A",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"new note 10\",\r\n    \"description\": \"this is a description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/notes"
+					},
+					"response": []
+				},
+				{
+					"name": "update note",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ1NTMxIiwiZW1haWwiOiJkZWFkbWFuQG1haWwuY29tIiwiaWF0IjoxNzAwNTAzMjkzLCJleHAiOjE3MDA1NDY0OTN9.Y5VugrOV3LYHWuaMPi8H7Bzu4gPudel9YrEupv5L23E",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"000000592331\",\r\n    \"title\": \"update note\",\r\n    \"description\": \"some new update\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/notes"
+					},
+					"response": []
+				},
+				{
+					"name": "delete note",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ1NTMxIiwiZW1haWwiOiJkZWFkbWFuQG1haWwuY29tIiwiaWF0IjoxNzAwNTAzMjkzLCJleHAiOjE3MDA1NDY0OTN9.Y5VugrOV3LYHWuaMPi8H7Bzu4gPudel9YrEupv5L23E",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{DEV_URL}}/notes?noteId=000000781614",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"notes"
+							],
+							"query": [
+								{
+									"key": "noteId",
+									"value": "000000781614"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"somemail@mail.com\",\r\n    \"password\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/auth/signup"
+					},
+					"response": []
+				},
+				{
+					"name": "signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mail@mail.com\",\r\n    \"password\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{DEV_URL}}/auth/signin"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "DEV_URL",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

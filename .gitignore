@@ -5,9 +5,6 @@ node_modules
 
 .env
 
-# Output directory
-dist
-
 # @vitjs/vit temporary directory
 .vit
 
