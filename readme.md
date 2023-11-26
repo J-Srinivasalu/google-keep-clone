@@ -11,7 +11,7 @@ The project is divided into two main components:
 
 ## Live Demo
 
-Check out the live demo of the Google Keep Clone [here](https://google-keep-clone-js26.netlify.app/auth).
+Check out the live demo of the Google Keep Clone [here](https://google-keep-clone-js26.netlify.app)
 
 ## Features
 
