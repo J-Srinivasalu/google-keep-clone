@@ -14,12 +14,9 @@ This component is responsible for handling server-side logic and data storage.
 1. Create a .env file in root
 
    ```.env
-   MONGO_DB_USER=<your-username>
-   MONGO_DB_PASSWORD=<your-password>
-   MONGO_DB_NAME=<db-name>
+   MONGO_DB_URL=<db-url>
    PORT=3000
    SECRET_KEY=secretkey
-   NODE_ENV=online
    ```
 
 2. Install dependencies.

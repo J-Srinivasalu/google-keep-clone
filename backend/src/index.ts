@@ -24,7 +24,6 @@ const PORT = config.server.port;
 mongoose
   .connect(config.mongo.url, { retryWrites: true, w: "majority" })
   .then(() => {
-    console.log(`Running on ENV = ${process.env.NODE_ENV}`);
     console.log("Connected to mongoDB.");
     app.listen(PORT, () => {
       console.log(`Server started on port: ${PORT}`);
